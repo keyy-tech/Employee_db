@@ -1,0 +1,44 @@
+{% extends "base_generic.html" %} {% block content %}
+    <div class="container mt-4">
+        <div class="form-container border p-4 rounded shadow">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="employee_name"><strong>Employee Name</strong></label>
+                    <input
+                            type="text"
+                            class="form-control"
+                            id="employee_name"
+                            value="{{ employee.user.first_name }} {{ employee.user.last_name }} {{ employee.other_names }}"
+                            readonly
+                    />
+                </div>
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary btn-submit mt-3">
+                    Save
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+<style>
+    .form-container {
+        border-radius: 15px; /* Add border radius to the form container */
+        background-color: #ffffff; /* Set background color */
+    }
+
+    .form-container h1 {
+        font-size: 1.5rem; /* Adjust font size */
+        font-weight: bold; /* Make the heading bold */
+    }
+
+    .form-container form {
+        margin-top: 20px; /* Add top margin to the form */
+    }
+
+    .form-container .btn-primary {
+        background-color: #007bff; /* Set the background color for the save button */
+        border-color: #007bff; /* Set the border color for the save button */
+    }
+</style>

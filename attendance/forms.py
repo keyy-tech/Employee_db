@@ -1,41 +1,55 @@
 from django import forms
-from .models import Leave, Attendance
+
 from employee.models import Employee
+from .models import Leave, Attendance
+
 
 class LeaveForm(forms.ModelForm):
     class Meta:
         model = Leave
-        fields = ['employee', 'leave_type', 'start_date', 'end_date', 'status']
+        fields = [
+            "employee",
+            "leave_type",
+            "start_date",
+            "end_date",
+        ]
         labels = {
-            'employee': 'Employee',
-            'leave_type': 'Leave Type',
-            'start_date': 'Start Date',
-            'end_date': 'End Date',
-            'status': 'Status',
+            "employee": "Employee",
+            "leave_type": "Leave Type",
+            "start_date": "Start Date",
+            "end_date": "End Date",
         }
         widgets = {
-            'employee': forms.Select(attrs={'class': 'form-control'}),
-            'leave_type': forms.Select(attrs={'class': 'form-control'}),
-            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'status': forms.Select(attrs={'class': 'form-control'}),
+            "employee": forms.Select(attrs={"class": "form-control"}),
+            "leave_type": forms.Select(attrs={"class": "form-control"}),
+            "start_date": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
+            "end_date": forms.DateInput(
+                attrs={"class": "form-control", "type": "date"}
+            ),
         }
 
+
 class AttendanceForm(forms.ModelForm):
-    employee_id = forms.CharField(max_length=100, label='Employee ID', widget=forms.TextInput(attrs={'class': 'form-control'}))
+    employee_id = forms.CharField(
+        max_length=100,
+        label="Employee ID",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
 
     class Meta:
         model = Attendance
-        fields = ['employee_id']
+        fields = ["employee_id"]
         labels = {
-            'employee_id': 'Employee ID',
+            "employee_id": "Employee ID",
         }
         widgets = {
-            'employee_id': forms.TextInput(attrs={'class': 'form-control'}),
+            "employee_id": forms.TextInput(attrs={"class": "form-control"}),
         }
 
     def clean_employee_id(self):
-        employee_id = self.cleaned_data.get('employee_id')
+        employee_id = self.cleaned_data.get("employee_id")
         try:
             employee = Employee.objects.get(employee_id=employee_id)
         except Employee.DoesNotExist:
@@ -44,7 +58,7 @@ class AttendanceForm(forms.ModelForm):
 
     def save(self, commit=True):
         attendance = super().save(commit=False)
-        employee_id = self.cleaned_data.get('employee_id')
+        employee_id = self.cleaned_data.get("employee_id")
         attendance.employee = Employee.objects.get(employee_id=employee_id)
         if commit:
             attendance.save()

@@ -1,5 +1,7 @@
 from django.db import models
+
 from employee.models import Employee
+
 
 class Task(models.Model):
     STATUS_CHOICES = [
@@ -18,7 +20,7 @@ class Task(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.status}"
-    
+
     class Meta:
         db_table = "task_154"
         managed = True
@@ -36,3 +38,16 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.employee.user.username}"
+
+
+class Announcement(models.Model):
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "announcement_154"
+        managed = True
+
+    def __str__(self):
+        return self.title

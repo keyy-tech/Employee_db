@@ -1,0 +1,45 @@
+<!-- filepath: c:\Users\emman\OneDrive\Desktop\Employee_db\templates\dashboard\leave_request.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="form-container border p-4 rounded shadow">
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Form Fields -->
+                <div class="form-group mb-3">
+                    <label for="id_leave_type"><strong>Employee</strong></label>
+                    {{ form.employee }}
+                    <div class="invalid-feedback">{{ form.employee.errors }}</div>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="id_leave_type"><strong>Leave Type</strong></label>
+                    {{ form.leave_type }}
+                    <div class="invalid-feedback">{{ form.leave_type.errors }}</div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_start_date"><strong>Start Date</strong></label>
+                    {{ form.start_date }}
+                    <div class="invalid-feedback">{{ form.start_date.errors }}</div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="id_end_date"><strong>End Date</strong></label>
+                    {{ form.end_date }}
+                    <div class="invalid-feedback">{{ form.end_date.errors }}</div>
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-submit mt-3">Submit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+<style>
+    .form-container {
+        border-radius: 15px; /* Add border radius to the form container */
+    }
+</style>

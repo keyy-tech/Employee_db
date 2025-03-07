@@ -1,0 +1,72 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="form-container border p-4 rounded shadow-sm">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="{{ form.employee.id_for_label }}"><strong>{{ form.employee.label }}</strong></label>
+                    {{ form.employee }}
+                    {% if form.employee.errors %}
+                        <div class="invalid-feedback d-block">{{ form.employee.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="{{ form.title.id_for_label }}"><strong>{{ form.title.label }}</strong></label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div class="invalid-feedback d-block">{{ form.title.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="{{ form.description.id_for_label }}"><strong>{{ form.description.label }}</strong></label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="invalid-feedback d-block">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="{{ form.due_date.id_for_label }}"><strong>{{ form.due_date.label }}</strong></label>
+                    {{ form.due_date }}
+                    {% if form.due_date.errors %}
+                        <div class="invalid-feedback d-block">{{ form.due_date.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group mb-3">
+                    <label for="{{ form.status.id_for_label }}"><strong>{{ form.status.label }}</strong></label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <div class="invalid-feedback d-block">{{ form.status.errors }}</div>
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary btn-submit mt-3">Save</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+<style>
+    .form-container {
+        border-radius: 15px; /* Add border radius to the form container */
+        background-color: #ffffff; /* Set background color */
+    }
+
+    .form-container h1 {
+        font-size: 1.5rem; /* Adjust font size */
+        font-weight: bold; /* Make the heading bold */
+    }
+
+    .form-container form {
+        margin-top: 20px; /* Add top margin to the form */
+    }
+
+    .form-container .btn-primary {
+        background-color: #007bff; /* Set the background color for the save button */
+        border-color: #007bff; /* Set the border color for the save button */
+    }
+
+    .invalid-feedback {
+        color: #dc3545; /* Set the color for error messages */
+    }
+</style>
