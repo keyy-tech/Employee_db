@@ -1,0 +1,23 @@
+<!-- filepath: c:\Users\emman\OneDrive\Desktop\Employee_db\templates\dashboard\payroll_update.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <div class="container mt-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Update Payroll</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary w-100">Update Payroll</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<style>
+    .form-container {
+        border-radius: 15px; /* Add border radius to the form container */
+    }
+</style>

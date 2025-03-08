@@ -81,17 +81,61 @@ def delete_leave(request, id):
     return redirect("leave_list")
 
 
-def attendance_view(request):
+def attendance_create(request):
     if request.method == "POST":
         form = AttendanceForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Attendance recorded successfully.")
-            return redirect("attendance")
+            employee_id = form.cleaned_data["employee_id"]  # corrected from "employee"
+
+            # Get the employee instance
+            try:
+                employee = Employee.objects.get(employee_id=employee_id)
+            except Employee.DoesNotExist:
+                messages.error(request, "This Employee ID does not exist.")
+                return redirect("attendance_create")
+
+            now = timezone.now()
+            today = now.date()
+            current_time = now.time()
+
+            # Check if the employee is on leave today
+            if Leave.objects.filter(
+                employee=employee,
+                start_date__lte=today,
+                end_date__gte=today,
+                status="Approved",
+            ).exists():
+                messages.error(
+                    request, "You are currently on leave. Please contact HR."
+                )
+                return redirect("attendance_create")
+
+            # Check if the employee has already checked in or out today
+            attendance = Attendance.objects.filter(
+                employee=employee, date=today
+            ).first()
+            if attendance:
+                if attendance.check_out_time:
+                    messages.error(request, "You have already checked out today.")
+                    return redirect("attendance_create")
+                else:
+                    # Update check-out time
+                    attendance.check_out_time = current_time
+                    attendance.save()
+                    messages.success(request, "Checked out successfully.")
+                    return redirect("attendance_create")
+            else:
+                # Create a new attendance record for check-in
+                attendance = Attendance(
+                    employee=employee, date=today, check_in_time=current_time
+                )
+                attendance.save()
+                messages.success(request, "Checked in successfully.")
+                return redirect("attendance_create")
         else:
-            messages.error(
-                request, "Error recording attendance. Please check the form for errors."
-            )
+            messages.error(request, "Invalid form submission.")
+            return redirect("attendance_create")
     else:
         form = AttendanceForm()
-    return render(request, "attendance/attendance.html", {"form": form})
+
+    return render(request, "attendance/attendance_form.html", {"form": form})

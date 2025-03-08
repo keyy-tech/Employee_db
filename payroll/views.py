@@ -24,7 +24,7 @@ def payroll_create(request, id):  # Add 'id' as an argument
             payroll = form.save(commit=False)
             payroll.employee = employee
             payroll.save()
-            messages.success(request, "Payroll created successfully-")
+            messages.success(request, "Payroll created successfully")
             return redirect("payroll_list")
     else:
         form = PayrollForm()
@@ -40,12 +40,14 @@ def payroll_update(request, id):
         form = PayrollForm(request.POST, instance=payroll)
         if form.is_valid():
             form.save()
-            messages.success(request, "Payroll updated successfully-")
+            messages.success(request, "Payroll updated successfully")
             return redirect("payroll_list")
 
     else:
         form = PayrollForm(instance=payroll)
-    return render(request, "payroll/payroll_form.html", {"form": form})
+    return render(
+        request, "payroll/payroll_update.html", {"form": form, "payroll": payroll}
+    )
 
 
 @login_required

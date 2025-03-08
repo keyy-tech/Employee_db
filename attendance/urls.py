@@ -9,5 +9,5 @@ urlpatterns = [
     path("leave/update/<int:id>", views.update_leave_view, name="update_leave"),
     path("leave/delete/<int:id>", views.delete_leave, name="delete_leave"),
     path("leave/list", views.leave_list, name="leave_list"),
-    path("attendance", views.attendance_view, name="attendance"),
+    path("attendance", views.attendance_create, name="attendance"),
 ]
