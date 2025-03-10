@@ -11,7 +11,7 @@ from .models import Payroll
 @login_required
 def payroll_list(request):
     employees = Employee.objects.all()
-    return render(request, "payroll/payroll_list.html", {"employees": employees})
+    return render(request, "payroll/list.html", {"employees": employees})
 
 
 @login_required
@@ -29,7 +29,7 @@ def payroll_create(request, id):  # Add 'id' as an argument
     else:
         form = PayrollForm()
     return render(
-        request, "payroll/payroll_form.html", {"form": form, "employee": employee}
+        request, "payroll/create.html", {"form": form, "employee": employee}
     )
 
 
@@ -46,7 +46,7 @@ def payroll_update(request, id):
     else:
         form = PayrollForm(instance=payroll)
     return render(
-        request, "payroll/payroll_update.html", {"form": form, "payroll": payroll}
+        request, "payroll/update.html", {"form": form, "payroll": payroll}
     )
 
 

@@ -1,18 +1,26 @@
 from django import forms
 from .models import Employee, Department
+from core.models import CustomUser
+
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
         model = Department
-        fields = ['name', 'hod']
+        fields = ["name", "hod"]
         labels = {
-            'name': 'Department Name',
-            'hod': 'Head of Department',
+            "name": "Department Name",
+            "hod": "Head of Department",
         }
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control'}),
-            'hod': forms.Select(attrs={'class': 'form-control'}),
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "hod": forms.Select(attrs={"class": "form-control"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)  # Correct indentation here
+        if "hod" in self.fields:  # Ensure 'hod' exists in form fields
+            self.fields["hod"].queryset = Employee.objects.filter(user__role="HOD")
+
 
 class EmployeeForm(forms.ModelForm):
     class Meta:

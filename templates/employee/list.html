@@ -1,129 +1,145 @@
 {% extends "base_generic.html" %}
 
+{% block title %}Employee List{% endblock %}
+
 {% block content %}
-    <div class="container mt-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <div>
-                        <label for="entriesSelect">Show</label>
-                        <select id="entriesSelect" class="form-select form-select-sm d-inline-block w-auto">
-                            <option value="10">10</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <label for="entriesSelect">entries</label>
-                    </div>
-                    <div>
-                        <input type="text" id="searchInput" class="form-control form-control-sm"
-                               placeholder="Search...">
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-bordered shadow-sm">
-                        <thead class="table-dark">
+<div class="container-fluid mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Employee List</h2>
+            <div class="d-flex">
+                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by employee name..." style="width: 300px;">
+                <select id="roleSelect" class="form-select me-2">
+                    <option value="">Filter by role</option>
+                    <option value="Admin">Admin</option>
+                    <option value="HOD">HOD</option>
+                    <option value="HR Manager">HR Manager</option>
+                    <option value="Employee">Employee</option>
+                </select>
+                <select id="rowsPerPageSelect" class="form-select">
+                    <option value="10">Show 10 rows</option>
+                    <option value="20">Show 20 rows</option>
+                    <option value="100">Show 100 rows</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
                         <tr>
-                            <th>Initials</th>
                             <th>Username</th>
                             <th>First Name</th>
                             <th>Last Name</th>
-                            <th>Email</th>
                             <th>Role</th>
+                            <th>Phone</th>
+                            <th>Department</th>
+                            <th>Job Position</th>
+                            <th>Date of Hire</th>
                             <th>Actions</th>
                         </tr>
-                        </thead>
-                        <tbody id="employeeTableBody">
+                    </thead>
+                    <tbody id="employeeTableBody">
                         {% for employee in employees %}
-                            <tr>
-                                <td class="text-center">
-                                    <div class="user-initials">
-                                        {{ employee.user.first_name.0 }}{{ employee.user.last_name.0 }}
-                                    </div>
-                                </td>
-                                <td>{{ employee.user.username }}</td>
-                                <td>{{ employee.user.first_name }}</td>
-                                <td>{{ employee.user.last_name }}</td>
-                                <td>{{ employee.user.email }}</td>
-                                <td>{{ employee.user.role }}</td>
-                                <td>
-                                    <a href="{% url 'update_employee' employee.user.id %}"
-                                       class="btn btn-warning btn-sm">Edit</a>
-                                    <a href="{% url 'delete_employee' employee.user.id %}"
-                                       class="btn btn-danger btn-sm">Delete</a>
-                                </td>
-                            </tr>
+                            {% if employee.user != request.user %}
+                                <tr>
+                                    <td>{{ employee.user.username }}</td>
+                                    <td>{{ employee.user.first_name }}</td>
+                                    <td>{{ employee.user.last_name }}</td>
+                                    <td>{{ employee.user.role }}</td>
+                                    <td>{{ employee.phone }}</td>
+                                    <td>{{ employee.department }}</td>
+                                    <td>{{ employee.job_position }}</td>
+                                    <td>{{ employee.date_of_hire }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-info btn-sm">View</a>
+                                        <a href="{% url 'update_employee' employee.user_id %}" class="btn btn-warning btn-sm">Edit</a>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-employee-id="{{ employee.user_id }}">Delete</button>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-{% endblock %}
+</div>
 
-<style>
-    .user-initials {
-        width: 35px;
-        height: 35px;
-        background: #2c3e50;
-        color: white;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        font-size: 1rem;
-        text-transform: uppercase;
-        margin: auto;
-    }
-
-    .table {
-        border-radius: 15px; /* Add border radius to the table */
-        overflow: hidden; /* Ensure rounded corners are visible */
-    }
-
-    .table td,
-    .table th {
-        padding: 1rem; /* Add padding to table cells */
-    }
-
-    .table-responsive {
-        padding: 1rem; /* Add padding around the table */
-    }
-
-    .table-dark {
-        border-top-left-radius: 15px; /* Add border radius to the top-left corner of the table header */
-        border-top-right-radius: 15px; /* Add border radius to the top-right corner of the table header */
-    }
-</style>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this employee?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const entriesSelect = document.getElementById("entriesSelect");
-        const searchInput = document.getElementById("searchInput");
-        const employeeTableBody = document.getElementById("employeeTableBody");
-        const rows = Array.from(employeeTableBody.getElementsByTagName("tr"));
-
-        entriesSelect.addEventListener("change", function () {
-            const value = parseInt(entriesSelect.value, 10);
-            rows.forEach((row, index) => {
-                row.style.display = index < value ? "" : "none";
-            });
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var employeeId = button.getAttribute('data-employee-id');
+            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+            confirmDeleteButton.href = '{% url "delete_employee" 0 %}'.replace('0', employeeId);
         });
 
-        searchInput.addEventListener("input", function () {
-            const searchTerm = searchInput.value.toLowerCase();
-            rows.forEach((row) => {
-                const cells = Array.from(row.getElementsByTagName("td"));
-                const matches = cells.some((cell) =>
-                    cell.textContent.toLowerCase().includes(searchTerm)
-                );
-                row.style.display = matches ? "" : "none";
-            });
-        });
+        // Search and filter functionality
+        var searchInput = document.getElementById('searchInput');
+        var roleSelect = document.getElementById('roleSelect');
+        var rowsPerPageSelect = document.getElementById('rowsPerPageSelect');
+        var employeeTableBody = document.getElementById('employeeTableBody');
 
-        // Initialize the table to show the first 10 entries
-        entriesSelect.value = "10";
-        entriesSelect.dispatchEvent(new Event("change"));
+        searchInput.addEventListener('input', filterTable);
+        roleSelect.addEventListener('change', filterTable);
+        rowsPerPageSelect.addEventListener('change', filterTable);
+
+        function filterTable() {
+            var searchValue = searchInput.value.toLowerCase();
+            var roleValue = roleSelect.value;
+            var rowsPerPage = parseInt(rowsPerPageSelect.value);
+            var rows = employeeTableBody.getElementsByTagName('tr');
+            var visibleRowCount = 0;
+
+            for (var i = 0; i < rows.length; i++) {
+                var usernameCell = rows[i].getElementsByTagName('td')[0];
+                var firstNameCell = rows[i].getElementsByTagName('td')[1];
+                var lastNameCell = rows[i].getElementsByTagName('td')[2];
+                var roleCell = rows[i].getElementsByTagName('td')[3];
+                var usernameText = usernameCell.textContent.toLowerCase();
+                var firstNameText = firstNameCell.textContent.toLowerCase();
+                var lastNameText = lastNameCell.textContent.toLowerCase();
+                var roleText = roleCell.textContent;
+
+                var matchesSearch = usernameText.includes(searchValue) || firstNameText.includes(searchValue) || lastNameText.includes(searchValue);
+                var matchesRole = roleValue === "" || roleText === roleValue;
+
+                if (matchesSearch && matchesRole) {
+                    if (visibleRowCount < rowsPerPage) {
+                        rows[i].style.display = "";
+                        visibleRowCount++;
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+        // Initial filter to apply rows per page setting
+        filterTable();
     });
 </script>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends 'base_generic.html' %}
+
+{% load static %}
+{% block content %}
+    <p>Hi {{ request.user.first_name }} - {{ request.user.group.role }}</p>
+{% endblock %}

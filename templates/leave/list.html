@@ -1,0 +1,163 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Leave Requests{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Leave Requests</h2>
+            <div class="d-flex">
+                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by employee name..." style="width: 300px;">
+                <select id="statusSelect" class="form-select me-2">
+                    <option value="">Filter by status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+                <select id="rowsPerPageSelect" class="form-select">
+                    <option value="10">Show 10 rows</option>
+                    <option value="20">Show 20 rows</option>
+                    <option value="100">Show 100 rows</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Leave Type</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaveTableBody">
+                        {% for leave in leaves %}
+                        <tr>
+                            <td>{{ leave.employee }}</td>
+                            <td>{{ leave.leave_type }}</td>
+                            <td>{{ leave.start_date }}</td>
+                            <td>{{ leave.end_date }}</td>
+                            <td>{{ leave.status }}</td>
+                            <td>
+                                {% if leave.status == "Pending" %}
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#approveModal" data-leave-id="{{ leave.id }}">Approve</button>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#rejectModal" data-leave-id="{{ leave.id }}">Reject</button>
+                                {% else %}
+                                    Completed
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approve Confirmation Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Confirm Approval</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to approve this leave request?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmApproveButton" class="btn btn-primary">Approve</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Confirmation Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">Confirm Rejection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to reject this leave request?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmRejectButton" class="btn btn-danger">Reject</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var approveModal = document.getElementById('approveModal');
+        var rejectModal = document.getElementById('rejectModal');
+
+        approveModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var leaveId = button.getAttribute('data-leave-id');
+            var confirmApproveButton = document.getElementById('confirmApproveButton');
+            confirmApproveButton.href = '{% url "approve_leave" 0 %}'.replace('0', leaveId);
+        });
+
+        rejectModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var leaveId = button.getAttribute('data-leave-id');
+            var confirmRejectButton = document.getElementById('confirmRejectButton');
+            confirmRejectButton.href = '{% url "reject_leave" 0 %}'.replace('0', leaveId);
+        });
+
+        // Search and filter functionality
+        var searchInput = document.getElementById('searchInput');
+        var statusSelect = document.getElementById('statusSelect');
+        var rowsPerPageSelect = document.getElementById('rowsPerPageSelect');
+        var leaveTableBody = document.getElementById('leaveTableBody');
+
+        searchInput.addEventListener('input', filterTable);
+        statusSelect.addEventListener('change', filterTable);
+        rowsPerPageSelect.addEventListener('change', filterTable);
+
+        function filterTable() {
+            var searchValue = searchInput.value.toLowerCase();
+            var statusValue = statusSelect.value;
+            var rowsPerPage = parseInt(rowsPerPageSelect.value);
+            var rows = leaveTableBody.getElementsByTagName('tr');
+            var visibleRowCount = 0;
+
+            for (var i = 0; i < rows.length; i++) {
+                var employeeCell = rows[i].getElementsByTagName('td')[0];
+                var statusCell = rows[i].getElementsByTagName('td')[4];
+                var employeeText = employeeCell.textContent.toLowerCase();
+                var statusText = statusCell.textContent;
+
+                var matchesSearch = employeeText.includes(searchValue);
+                var matchesStatus = statusValue === "" || statusText === statusValue;
+
+                if (matchesSearch && matchesStatus) {
+                    if (visibleRowCount < rowsPerPage) {
+                        rows[i].style.display = "";
+                        visibleRowCount++;
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+        // Initial filter to apply rows per page setting
+        filterTable();
+    });
+</script>
+{% endblock %}

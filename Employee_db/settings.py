@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "payroll.apps.PayrollConfig",
     "information.apps.InformationConfig",
     "dashboard.apps.DashboardConfig",
+    "Audit.apps.AuditConfig",
 ]
 
 MIDDLEWARE = [

@@ -1,146 +1,42 @@
-{% extends "base_generic.html" %} {% block content %}
-<div class="container mt-5">
-  <div class="form-container border p-4 rounded shadow">
-    <h2 class="mb-4">Update Employee</h2>
-    <form method="post">
-      {% csrf_token %}
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group mb-3">
-            <label for="id_username"><strong>Username</strong></label>
-            {{ user_form.username }}
-            <div class="invalid-feedback">{{ user_form.username.errors }}</div>
-          </div>
+{% extends "base_generic.html" %}
 
-          <div class="form-group mb-3">
-            <label for="id_first_name"><strong>First Name</strong></label>
-            {{ user_form.first_name }}
-            <div class="invalid-feedback">
-              {{ user_form.first_name.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_last_name"><strong>Last Name</strong></label>
-            {{ user_form.last_name }}
-            <div class="invalid-feedback">{{ user_form.last_name.errors }}</div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_email"><strong>Email</strong></label>
-            {{ user_form.email }}
-            <div class="invalid-feedback">{{ user_form.email.errors }}</div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_role"><strong>Role</strong></label>
-            {{ user_form.role }}
-            <div class="invalid-feedback">{{ user_form.role.errors }}</div>
-          </div>
+{% block content %}
+<div class="form-wrapper">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Update Employee</h2>
         </div>
-
-        <div class="col-md-6">
-          <div class="form-group mb-3">
-            <label for="id_other_names"><strong>Other Names</strong></label>
-            {{ employee_form.other_names }}
-            <div class="invalid-feedback">
-              {{ employee_form.other_names.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_phone"><strong>Phone</strong></label>
-            {{ employee_form.phone }}
-            <div class="invalid-feedback">{{ employee_form.phone.errors }}</div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_date_of_birth"><strong>Date of Birth</strong></label>
-            {{ employee_form.date_of_birth }}
-            <div class="invalid-feedback">
-              {{ employee_form.date_of_birth.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_gender"><strong>Gender</strong></label>
-            {{ employee_form.gender }}
-            <div class="invalid-feedback">
-              {{ employee_form.gender.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_department"><strong>Department</strong></label>
-            {{ employee_form.department }}
-            <div class="invalid-feedback">
-              {{ employee_form.department.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_job_position"><strong>Job Position</strong></label>
-            {{ employee_form.job_position }}
-            <div class="invalid-feedback">
-              {{ employee_form.job_position.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_date_of_hire"><strong>Date of Hire</strong></label>
-            {{ employee_form.date_of_hire }}
-            <div class="invalid-feedback">
-              {{ employee_form.date_of_hire.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_address"><strong>Address</strong></label>
-            {{ employee_form.address }}
-            <div class="invalid-feedback">
-              {{ employee_form.address.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_emergency_contact_name"
-              ><strong>Emergency Contact Name</strong></label
-            >
-            {{ employee_form.emergency_contact_name }}
-            <div class="invalid-feedback">
-              {{ employee_form.emergency_contact_name.errors }}
-            </div>
-          </div>
-
-          <div class="form-group mb-3">
-            <label for="id_emergency_contact_phone"
-              ><strong>Emergency Contact Phone</strong></label
-            >
-            {{ employee_form.emergency_contact_phone }}
-            <div class="invalid-feedback">
-              {{ employee_form.emergency_contact_phone.errors }}
-            </div>
-          </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ user_form.as_p }}
+                </div>
+                <div class="mb-3">
+                    {{ employee_form.as_p }}
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Update Employee</button>
+                </div>
+            </form>
         </div>
-      </div>
-
-      <div class="d-flex justify-content-end mt-3">
-        <button type="submit" class="btn btn-primary">Update</button>
-      </div>
-    </form>
-  </div>
+    </div>
 </div>
-{% endblock %}
 
 <style>
-  .form-container {
-    border-radius: 15px; /* Add border radius to the form container */
-  }
-  .form-label {
-    font-weight: bold; /* Make the form labels bold */
-  }
-  .btn-primary {
-    background-color: #007bff; /* Set the background color for the update button */
-    border-color: #007bff; /* Set the border color for the update button */
-  }
+    .form-wrapper {
+        width: 90%;
+        max-width: 1200px; /* Increased width */
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
 </style>
+{% endblock %}
