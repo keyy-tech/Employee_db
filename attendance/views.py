@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from .forms import LeaveForm
-from .models import Leave
+from .forms import LeaveForm,CheckInForm,CheckOutForm
+from .models import Leave,Attendance
 from employee.models import Employee
-
+from django.utils import timezone
 
 @login_required
 def leave_request_view(request):
@@ -130,3 +130,63 @@ def my_leave_requests(request):
     employee = request.user.employee
     leaves = Leave.objects.filter(employee=employee)
     return render(request, "leave/my_leave_requests.html", {"leaves": leaves})
+
+
+@login_required
+def check_in(request):
+    if request.method == "POST":
+        form = CheckInForm(request.POST)
+        if form.is_valid():
+            employee_id = form.cleaned_data["employee_id"]
+            try:
+                employee = Employee.objects.get(id=employee_id)
+            except Employee.DoesNotExist:
+                messages.error(request, "Employee does not exist.")
+                return redirect("check_in")
+            
+            attendance, created = Attendance.objects.get_or_create(employee=employee, date=timezone.now().date())
+            if attendance.check_in_time is None:
+                attendance.check_in_time = timezone.now().time()
+                attendance.save()
+                messages.success(request, "Checked in successfully.")
+            else:
+                messages.error(request, "You have already checked in today.")
+            return redirect("check_in")
+    else:
+        form = CheckInForm()
+    return render(request, "attendance/check_in.html", {"form": form})
+
+@login_required
+def check_out(request):
+    if request.method == "POST":
+        form = CheckOutForm(request.POST)
+        if form.is_valid():
+            employee_id = form.cleaned_data["employee_id"]
+            try:
+                employee = Employee.objects.get(id=employee_id)
+            except Employee.DoesNotExist:
+                messages.error(request, "Employee does not exist.")
+                return redirect("check_out")
+            
+            try:
+                attendance = Attendance.objects.get(employee=employee, date=timezone.now().date())
+            except Attendance.DoesNotExist:
+                messages.error(request, "No check-in record found for today.")
+                return redirect("check_out")
+            
+            if attendance.check_out_time is None:
+                attendance.check_out_time = timezone.now().time()
+                attendance.save()
+                messages.success(request, "Checked out successfully.")
+            else:
+                messages.error(request, "You have already checked out today.")
+            return redirect("check_out")
+    else:
+        form = CheckOutForm()
+    return render(request, "attendance/check_out.html", {"form": form})
+
+@login_required
+def attendance_list(request):
+    """View to display the attendance records."""
+    attendance_records = Attendance.objects.all()
+    return render(request, "attendance/list.html", {"attendance_records": attendance_records})

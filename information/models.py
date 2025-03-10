@@ -48,6 +48,7 @@ class Announcement(models.Model):
     class Meta:
         db_table = "announcement_154"
         managed = True
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title

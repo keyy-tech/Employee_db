@@ -1,6 +1,59 @@
 {% extends 'base_generic.html' %}
 
-{% load static %}
+{% block title %}Home{% endblock %}
+
 {% block content %}
-    <p>Hi {{ request.user.first_name }} - {{ request.user.group.role }}</p>
+<div class="container mt-5">
+    <h2>Welcome to the Employee Management System</h2>
+    <p>Hello, {{ request.user.first_name }}!</p>
+    <p>Your role: {{ request.user.role }}</p>
+
+    <div class="row mt-4">
+        {% if request.user.role == "Admin" %}
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Admin Panel</div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage Employees</h5>
+                    <p class="card-text">Access the admin panel to manage employees, departments, and payroll.</p>
+                    <a href="#" class="btn btn-light">Go to Admin Panel</a>
+                </div>
+            </div>
+        </div>
+        {% elif request.user.role == "HOD" %}
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">HOD Dashboard</div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage Department</h5>
+                    <p class="card-text">Access the HOD dashboard to manage your department and tasks.</p>
+                    <a href="#" class="btn btn-light">Go to HOD Dashboard</a>
+                </div>
+            </div>
+        </div>
+        {% elif request.user.role == "HR Manager" %}
+        <div class="col-md-4">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-header">HR Dashboard</div>
+                <div class="card-body">
+                    <h5 class="card-title">Manage HR Tasks</h5>
+                    <p class="card-text">Access the HR dashboard to manage HR tasks and employee records.</p>
+                    <a href="#" class="btn btn-light">Go to HR Dashboard</a>
+                </div>
+            </div>
+        </div>
+        {% elif request.user.role == "Employee" %}
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Employee Dashboard</div>
+                <div class="card-body">
+                    <h5 class="card-title">View Tasks</h5>
+                    <p class="card-text">Access your dashboard to view tasks and manage your profile.</p>
+                    <a href="#" class="btn btn-light">Go to Employee Dashboard</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

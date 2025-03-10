@@ -89,8 +89,8 @@
         deleteModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             var payrollId = button.getAttribute('data-id');
-            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
-            confirmDeleteButton.href = '{% url "payroll_delete" 0 %}'.replace('0', payrollId);
+            var deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = '{% url "payroll_delete" 0 %}'.replace('0', payrollId);
         });
 
         // Search and filter functionality
@@ -108,12 +108,15 @@
 
             for (var i = 0; i < rows.length; i++) {
                 var nameCell = rows[i].getElementsByTagName('td')[0];
-                var statusCell = rows[i].getElementsByTagName('td')[5];
+                var statusCell = rows[i].getElementsByTagName('td')[3];
                 var nameText = nameCell.textContent.toLowerCase();
-                var statusText = statusCell.textContent.toLowerCase();
+
+                // Check for the badge class to determine the status
+                var statusBadge = statusCell.querySelector('.badge');
+                var statusClass = statusBadge ? statusBadge.classList.contains('badge-success') ? 'completed' : 'not_completed' : '';
 
                 var matchesSearch = nameText.includes(searchValue);
-                var matchesStatus = statusValue === "" || (statusValue === "completed" && statusText.includes("completed")) || (statusValue === "not_completed" && statusText.includes("not completed"));
+                var matchesStatus = statusValue === "" || (statusValue === "completed" && statusClass === 'completed') || (statusValue === "not_completed" && statusClass === 'not_completed');
 
                 if (matchesSearch && matchesStatus) {
                     rows[i].style.display = "";

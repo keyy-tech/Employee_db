@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Attendance Records{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Attendance Records</h2>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Date</th>
+                        <th>Check-In Time</th>
+                        <th>Check-Out Time</th>
+                        <th>Total Working Hours</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance_records %}
+                    <tr>
+                        <td>{{ record.employee }}</td>
+                        <td>{{ record.date }}</td>
+                        <td>{{ record.check_in_time }}</td>
+                        <td>{{ record.check_out_time }}</td>
+                        <td>{{ record.total_working_hours }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

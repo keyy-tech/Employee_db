@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Task
+from .models import Task, Announcement
 
 
 class TaskForm(forms.ModelForm):
@@ -20,4 +20,18 @@ class TaskForm(forms.ModelForm):
             "due_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}
             ),
+        }
+
+
+class AnnouncementForm(forms.ModelForm):
+    class Meta:
+        model = Announcement
+        fields = ["title", "message"]
+        labels = {
+            "title": "Title",
+            "message": "Message",
+        }
+        widgets = {
+            "title": forms.TextInput(attrs={"class": "form-control"}),
+            "message": forms.Textarea(attrs={"class": "form-control"}),
         }
