@@ -1,0 +1,26 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Create Payroll{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Create Payroll for {{ employee.user.first_name }} {{ employee.user.last_name }}</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="employeeName" class="form-label">Employee Name</label>
+                    <input type="text" id="employeeName" class="form-control" value="{{ employee.user.first_name }} {{ employee.user.last_name }}" readonly>
+                </div>
+                {{ form.as_p }}
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Create Payroll</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

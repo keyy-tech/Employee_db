@@ -1,0 +1,41 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Leave Request{% endblock %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Leave Request</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Submit Leave Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-wrapper {
+        width: 90%;
+        max-width: 1200px; /* Increased width */
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
+</style>
+{% endblock %}

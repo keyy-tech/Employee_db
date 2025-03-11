@@ -1,20 +1,31 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
-from .forms import LeaveForm, AttendanceForm
-from .models import Leave
+from employee.models import Employee
+from .forms import LeaveForm, CheckInForm, CheckOutForm
+from .models import Leave, Attendance
 
 
+@login_required
 def leave_request_view(request):
+    """Allows logged-in users to request leave."""
+    try:
+        employee = request.user.employee  # Check if user has an Employee profile
+    except Employee.DoesNotExist:
+        messages.error(request, "Only employees can request leave.")
+        return redirect("dashboard")  # Redirect to a generic dashboard
+
     if request.method == "POST":
         form = LeaveForm(request.POST)
         if form.is_valid():
             leave = form.save(commit=False)
             leave.status = "Pending"
+            leave.employee = employee  # Assign the employee instance
             leave.save()
             messages.success(request, "Leave request submitted successfully.")
-            return redirect("leave_request")
+            return redirect("my_leave_requests")
         else:
             messages.error(
                 request,
@@ -22,17 +33,34 @@ def leave_request_view(request):
             )
     else:
         form = LeaveForm()
-    return render(request, "leave/leave_request.html", {"form": form})
+    return render(request, "leave/create.html", {"form": form})
 
 
+@login_required
 def update_leave_view(request, id):
-    leave = Leave.objects.get(id=id)
+    leave = get_object_or_404(Leave, id=id)
+
+    # Check if the logged-in user is the owner of the leave request
+    if leave.employee.user != request.user:
+        messages.error(
+            request, "You do not have permission to update this leave request."
+        )
+        return redirect("my_leave_requests")
+
+    # Check if the leave request is already approved or rejected
+    if leave.status in ["Approved", "Rejected"]:
+        messages.error(
+            request,
+            "You cannot update a leave request that has been approved or rejected.",
+        )
+        return redirect("my_leave_requests")
+
     if request.method == "POST":
         form = LeaveForm(request.POST, instance=leave)
         if form.is_valid():
             form.save()
             messages.success(request, "Leave request updated successfully.")
-            return redirect("leave_list")
+            return redirect("my_leave_requests")
         else:
             messages.error(
                 request,
@@ -40,12 +68,36 @@ def update_leave_view(request, id):
             )
     else:
         form = LeaveForm(instance=leave)
-    return render(request, "leave/leave_request.html", {"form": form, "leave": leave})
+    return render(request, "leave/update.html", {"form": form, "leave": leave})
+
+
+@login_required
+def delete_leave(request, id):
+    leave = get_object_or_404(Leave, id=id)
+
+    # Check if the logged-in user is the owner of the leave request
+    if leave.employee.user != request.user:
+        messages.error(
+            request, "You do not have permission to delete this leave request."
+        )
+        return redirect("my_leave_requests")
+
+    # Check if the leave request is already approved or rejected
+    if leave.status in ["Approved", "Rejected"]:
+        messages.error(
+            request,
+            "You cannot delete a leave request that has been approved or rejected.",
+        )
+        return redirect("my_leave_requests")
+
+    leave.delete()
+    messages.success(request, "Leave request deleted successfully.")
+    return redirect("my_leave_requests")
 
 
 def leave_list(request):
     leaves = Leave.objects.all()
-    return render(request, "leave/leave_list.html", {"leaves": leaves})
+    return render(request, "leave/list.html", {"leaves": leaves})
 
 
 def approve_leave(request, id):
@@ -74,68 +126,98 @@ def reject_leave(request, id):
     return redirect("leave_list")
 
 
-def delete_leave(request, id):
-    leave = get_object_or_404(Leave, id=id)
-    leave.delete()
-    messages.success(request, "Leave request deleted successfully.")
-    return redirect("leave_list")
+@login_required
+def approved_leave_requests(request):
+    """View to show approved leave requests of employees in the HOD's department."""
+    if request.user.role == "HOD":
+        department = request.user.employee.department
+        approved_leaves = Leave.objects.filter(
+            employee__department=department, status="Approved"
+        )
+    else:
+        approved_leaves = Leave.objects.none()  # Empty queryset for non-HOD users
+    return render(
+        request,
+        "leave/approved_leave_requests.html",
+        {"approved_leaves": approved_leaves},
+    )
 
 
-def attendance_create(request):
+@login_required
+def my_leave_requests(request):
+    """View to show only the leave requests of the logged-in user."""
+    employee = request.user.employee
+    leaves = Leave.objects.filter(employee=employee)
+    return render(request, "leave/my_leave_requests.html", {"leaves": leaves})
+
+
+@login_required
+def check_in(request):
     if request.method == "POST":
-        form = AttendanceForm(request.POST)
+        form = CheckInForm(request.POST)
         if form.is_valid():
-            employee_id = form.cleaned_data["employee_id"]  # corrected from "employee"
-
-            # Get the employee instance
+            employee_id = form.cleaned_data["employee_id"]
             try:
-                employee = Employee.objects.get(employee_id=employee_id)
+                employee = Employee.objects.get(id=employee_id)
             except Employee.DoesNotExist:
-                messages.error(request, "This Employee ID does not exist.")
-                return redirect("attendance_create")
+                messages.error(request, "Employee does not exist.")
+                return redirect("check_in")
 
-            now = timezone.now()
-            today = now.date()
-            current_time = now.time()
-
-            # Check if the employee is on leave today
-            if Leave.objects.filter(
-                employee=employee,
-                start_date__lte=today,
-                end_date__gte=today,
-                status="Approved",
-            ).exists():
-                messages.error(
-                    request, "You are currently on leave. Please contact HR."
-                )
-                return redirect("attendance_create")
-
-            # Check if the employee has already checked in or out today
-            attendance = Attendance.objects.filter(
-                employee=employee, date=today
-            ).first()
-            if attendance:
-                if attendance.check_out_time:
-                    messages.error(request, "You have already checked out today.")
-                    return redirect("attendance_create")
-                else:
-                    # Update check-out time
-                    attendance.check_out_time = current_time
-                    attendance.save()
-                    messages.success(request, "Checked out successfully.")
-                    return redirect("attendance_create")
-            else:
-                # Create a new attendance record for check-in
-                attendance = Attendance(
-                    employee=employee, date=today, check_in_time=current_time
-                )
+            attendance, created = Attendance.objects.get_or_create(
+                employee=employee, date=timezone.now().date()
+            )
+            if attendance.check_in_time is None:
+                attendance.check_in_time = timezone.now().time()
                 attendance.save()
                 messages.success(request, "Checked in successfully.")
-                return redirect("attendance_create")
-        else:
-            messages.error(request, "Invalid form submission.")
-            return redirect("attendance_create")
+            else:
+                messages.error(request, "You have already checked in today.")
+            return redirect("check_in")
     else:
-        form = AttendanceForm()
+        form = CheckInForm()
+    return render(request, "attendance/check_in.html", {"form": form})
 
-    return render(request, "attendance/attendance_form.html", {"form": form})
+
+@login_required
+def check_out(request):
+    if request.method == "POST":
+        form = CheckOutForm(request.POST)
+        if form.is_valid():
+            employee_id = form.cleaned_data["employee_id"]
+            try:
+                employee = Employee.objects.get(id=employee_id)
+            except Employee.DoesNotExist:
+                messages.error(request, "Employee does not exist.")
+                return redirect("check_out")
+
+            try:
+                attendance = Attendance.objects.get(
+                    employee=employee, date=timezone.now().date()
+                )
+            except Attendance.DoesNotExist:
+                messages.error(request, "No check-in record found for today.")
+                return redirect("check_out")
+
+            if attendance.check_out_time is None:
+                attendance.check_out_time = timezone.now().time()
+                attendance.save()
+                messages.success(request, "Checked out successfully.")
+            else:
+                messages.error(request, "You have already checked out today.")
+            return redirect("check_out")
+    else:
+        form = CheckOutForm()
+    return render(request, "attendance/check_out.html", {"form": form})
+
+
+@login_required
+def attendance_list(request):
+    """View to display the attendance records."""
+    if request.user.role == "HOD":
+        department = request.user.employee.department
+        attendance_records = Attendance.objects.filter(employee__department=department)
+    else:
+        attendance_records = Attendance.objects.all()
+    return render(
+        request, "attendance/list.html", {"attendance_records": attendance_records}
+    )

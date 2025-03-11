@@ -1,0 +1,101 @@
+{% extends "base_generic.html" %}
+
+{% block title %}My Leave Requests{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">My Leave Requests</h2>
+            <div class="d-flex">
+                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by leave type..." style="width: 300px;">
+                <a href="{% url 'leave_request' %}" class="btn btn-light">Create Leave Request</a>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="leaveTableBody">
+                    {% for leave in leaves %}
+                    <tr>
+                        <td>{{ leave.leave_type }}</td>
+                        <td>{{ leave.start_date }}</td>
+                        <td>{{ leave.end_date }}</td>
+                        <td>{{ leave.status }}</td>
+                        <td>
+                            {% if leave.status == "Pending" %}
+                                <a href="{% url 'update_leave' leave.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-leave-id="{{ leave.id }}">Delete</button>
+                            {% else %}
+                                Completed
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this leave request?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var deleteModal = document.getElementById('deleteModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var leaveId = button.getAttribute('data-leave-id');
+            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+            confirmDeleteButton.href = '{% url "delete_leave" 0 %}'.replace('0', leaveId);
+        });
+
+        // Search functionality
+        var searchInput = document.getElementById('searchInput');
+        var leaveTableBody = document.getElementById('leaveTableBody');
+
+        searchInput.addEventListener('input', filterTable);
+
+        function filterTable() {
+            var searchValue = searchInput.value.toLowerCase();
+            var rows = leaveTableBody.getElementsByTagName('tr');
+
+            for (var i = 0; i < rows.length; i++) {
+                var leaveTypeCell = rows[i].getElementsByTagName('td')[0];
+                var leaveTypeText = leaveTypeCell.textContent.toLowerCase();
+
+                if (leaveTypeText.includes(searchValue)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

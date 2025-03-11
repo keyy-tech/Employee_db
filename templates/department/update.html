@@ -1,46 +1,41 @@
-{% extends "base_generic.html" %} {% block content %}
-<div class="container mt-5">
-  <div class="form-container border p-4 rounded shadow">
-    <form method="post">
-      {% csrf_token %}
+{% extends "base_generic.html" %}
 
-      <!-- Form Fields -->
-      <div class="form-group mb-3">
-        <label for="id_name"><strong>Department Name</strong></label>
-        {{ form.name }} {% if form.name.errors %}
-        <div class="invalid-feedback d-block">{{ form.name.errors }}</div>
-        {% endif %}
-      </div>
+{% block title %}Update Department{% endblock %}
 
-      <div class="form-group mb-3">
-        <label for="id_hod"><strong>Head of Department</strong></label>
-        {{ form.hod }} {% if form.hod.errors %}
-        <div class="invalid-feedback d-block">{{ form.hod.errors }}</div>
-        {% endif %}
-      </div>
-
-      <button type="submit" class="btn btn-primary btn-submit mt-3">
-        Update
-      </button>
-    </form>
-  </div>
+{% block content %}
+<div class="form-wrapper">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Update Department</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Update Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-{% endblock %}
 
 <style>
-  .form-container {
-    border-radius: 15px; /* Add border radius to the form container */
-    background-color: #ffffff; /* Set background color */
-  }
-  .form-container h1 {
-    font-size: 1.5rem; /* Adjust font size */
-    font-weight: bold; /* Make the heading bold */
-  }
-  .form-container form {
-    margin-top: 20px; /* Add top margin to the form */
-  }
-  .form-container .btn-primary {
-    background-color: #007bff; /* Set the background color for the update button */
-    border-color: #007bff; /* Set the border color for the update button */
-  }
+    .form-wrapper {
+        width: 90%;
+        max-width: 1200px; /* Increased width */
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
 </style>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Announcement Detail{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">{{ announcement.title }}</h2>
+        </div>
+        <div class="card-body">
+            <fieldset class="border p-2">
+                <legend class="w-auto px-2">Announcement Details</legend>
+                <div class="mb-3">
+                    <label for="title" class="form-label"><strong>Title:</strong></label>
+                    <input type="text" id="title" class="form-control" value="{{ announcement.title }}" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label"><strong>Message:</strong></label>
+                    <textarea id="message" class="form-control" rows="5" column="7" readonly>{{ announcement.message }}</textarea>
+                </div>
+                <p><strong>Created At:</strong> {{ announcement.created_at }}</p>
+            </fieldset>
+            <a href="{% url 'announcement_list' %}" class="btn btn-secondary mt-3">Back to Announcements</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

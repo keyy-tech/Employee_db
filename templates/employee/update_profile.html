@@ -1,0 +1,42 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<div class="form-wrapper">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Update Profile</h2>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ user_form.as_p }}
+                </div>
+                <div class="mb-3">
+                    {{ employee_form.as_p }}
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-wrapper {
+        width: 90%;
+        max-width: 1200px; /* Increased width */
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    form {
+        width: 100%;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'base_generic.html' %} {% block title %}Employees in Your
+Department{% endblock %} {% block content %}
+<div class="container mt-5">
+  <h2>Employees in Your Department</h2>
+
+  <div class="card mb-4">
+    <div
+      class="card-header bg-success text-white d-flex justify-content-between align-items-center"
+    >
+      <h5 class="mb-0">Employees</h5>
+      <div class="d-flex">
+        <input
+          type="text"
+          id="searchInput"
+          class="form-control me-2"
+          placeholder="Search by name or job position"
+          style="width: 300px"
+        />
+        <select id="rowsSelect" class="form-select me-2" style="width: 150px">
+          <option value="10">Show 10 rows</option>
+          <option value="20">Show 20 rows</option>
+          <option value="50">Show 50 rows</option>
+          <option value="all">Show All</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped table-hover table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Job Position</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody id="employeeTableBody">
+          {% for employee in employees %} {% if employee.user != request.user %}
+          <tr>
+            <td>
+              {{ employee.user.first_name }} {{ employee.user.last_name }}
+            </td>
+            <td>{{ employee.department }}</td>
+            <td>{{ employee.job_position }}</td>
+            <td>{{ employee.user.email }}</td>
+          </tr>
+          {% endif %} {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var searchInput = document.getElementById("searchInput");
+    var rowsSelect = document.getElementById("rowsSelect");
+    var employeeTableBody = document.getElementById("employeeTableBody");
+
+    function filterTable() {
+      var searchValue = searchInput.value.toLowerCase();
+      var rowsValue = rowsSelect.value;
+      var rows = employeeTableBody.getElementsByTagName("tr");
+
+      var visibleRows = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var nameCell = rows[i].getElementsByTagName("td")[0];
+        var jobPositionCell = rows[i].getElementsByTagName("td")[2];
+        var nameText = nameCell.textContent.toLowerCase();
+        var jobPositionText = jobPositionCell.textContent.toLowerCase();
+
+        var matchesSearch =
+          nameText.includes(searchValue) ||
+          jobPositionText.includes(searchValue);
+
+        if (matchesSearch) {
+          if (rowsValue === "all" || visibleRows < parseInt(rowsValue)) {
+            rows[i].style.display = "";
+            visibleRows++;
+          } else {
+            rows[i].style.display = "none";
+          }
+        } else {
+          rows[i].style.display = "none";
+        }
+      }
+    }
+
+    searchInput.addEventListener("input", filterTable);
+    rowsSelect.addEventListener("change", filterTable);
+  });
+</script>
+{% endblock %}
