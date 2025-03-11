@@ -19,9 +19,7 @@ urlpatterns = [
     path(
         "update_profile/", views.update_profile, name="update_profile"
     ),  # Update profile
-    path(
-        "profile/", views.profile, name="profile"
-    ),  # View profile
+    path("profile/", views.profile, name="profile"),  # View profile
     # Department management URLs
     path(
         "create_department/", views.create_department, name="create_department"
@@ -35,4 +33,7 @@ urlpatterns = [
     path(
         "list_departments/", views.read_departments, name="department_list"
     ),  # List departments
+    path(
+        "list_employee_department/", views.hod_employee, name="list_employee_department"
+    ),
 ]

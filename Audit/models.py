@@ -1,17 +1,13 @@
 from django.db import models
-from django.utils.timezone import now
-
-from core.models import CustomUser
 
 
-class AuditUserLogin(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    login_time = models.DateTimeField(default=now)
-    logout_time = models.DateTimeField(null=True, blank=True)
+class AuditLog(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    table_name = models.CharField(max_length=100)
+    action_type = models.CharField(max_length=10)  # INSERT, UPDATE, DELETE
+    action_time = models.DateTimeField(auto_now_add=True)
+    record_id = models.BigIntegerField()
 
     class Meta:
-        db_table = "audit_user_login_154"
-        managed = False  # Assuming this table is managed externally
-
-    def __str__(self):
-        return f"{self.user.employee.employee_id} - {self.login_time}"
+        db_table = "audit_log_154"
+        managed = False

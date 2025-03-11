@@ -1,10 +1,12 @@
 from django.contrib import messages
-from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from .forms import LeaveForm,CheckInForm,CheckOutForm
-from .models import Leave,Attendance
-from employee.models import Employee
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+
+from employee.models import Employee
+from .forms import LeaveForm, CheckInForm, CheckOutForm
+from .models import Leave, Attendance
+
 
 @login_required
 def leave_request_view(request):
@@ -125,6 +127,23 @@ def reject_leave(request, id):
 
 
 @login_required
+def approved_leave_requests(request):
+    """View to show approved leave requests of employees in the HOD's department."""
+    if request.user.role == "HOD":
+        department = request.user.employee.department
+        approved_leaves = Leave.objects.filter(
+            employee__department=department, status="Approved"
+        )
+    else:
+        approved_leaves = Leave.objects.none()  # Empty queryset for non-HOD users
+    return render(
+        request,
+        "leave/approved_leave_requests.html",
+        {"approved_leaves": approved_leaves},
+    )
+
+
+@login_required
 def my_leave_requests(request):
     """View to show only the leave requests of the logged-in user."""
     employee = request.user.employee
@@ -143,8 +162,10 @@ def check_in(request):
             except Employee.DoesNotExist:
                 messages.error(request, "Employee does not exist.")
                 return redirect("check_in")
-            
-            attendance, created = Attendance.objects.get_or_create(employee=employee, date=timezone.now().date())
+
+            attendance, created = Attendance.objects.get_or_create(
+                employee=employee, date=timezone.now().date()
+            )
             if attendance.check_in_time is None:
                 attendance.check_in_time = timezone.now().time()
                 attendance.save()
@@ -155,6 +176,7 @@ def check_in(request):
     else:
         form = CheckInForm()
     return render(request, "attendance/check_in.html", {"form": form})
+
 
 @login_required
 def check_out(request):
@@ -167,13 +189,15 @@ def check_out(request):
             except Employee.DoesNotExist:
                 messages.error(request, "Employee does not exist.")
                 return redirect("check_out")
-            
+
             try:
-                attendance = Attendance.objects.get(employee=employee, date=timezone.now().date())
+                attendance = Attendance.objects.get(
+                    employee=employee, date=timezone.now().date()
+                )
             except Attendance.DoesNotExist:
                 messages.error(request, "No check-in record found for today.")
                 return redirect("check_out")
-            
+
             if attendance.check_out_time is None:
                 attendance.check_out_time = timezone.now().time()
                 attendance.save()
@@ -185,8 +209,15 @@ def check_out(request):
         form = CheckOutForm()
     return render(request, "attendance/check_out.html", {"form": form})
 
+
 @login_required
 def attendance_list(request):
     """View to display the attendance records."""
-    attendance_records = Attendance.objects.all()
-    return render(request, "attendance/list.html", {"attendance_records": attendance_records})
+    if request.user.role == "HOD":
+        department = request.user.employee.department
+        attendance_records = Attendance.objects.filter(employee__department=department)
+    else:
+        attendance_records = Attendance.objects.all()
+    return render(
+        request, "attendance/list.html", {"attendance_records": attendance_records}
+    )

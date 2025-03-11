@@ -1,0 +1,39 @@
+{% extends 'base_generic.html' %}
+
+{% block title %}Approved Leave Requests{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Approved Leave Requests</h2>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Approved Leave Requests</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Employee</th>
+                        <th>Leave Type</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in approved_leaves %}
+                    <tr>
+                        <td>{{ leave.employee.user.first_name }} {{ leave.employee.user.last_name }}</td>
+                        <td>{{ leave.leave_type }}</td>
+                        <td>{{ leave.start_date }}</td>
+                        <td>{{ leave.end_date }}</td>
+                        <td>{{ leave.reason }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

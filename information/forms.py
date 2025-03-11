@@ -1,5 +1,6 @@
 from django import forms
 
+from employee.models import Employee
 from .models import Task, Announcement
 
 
@@ -21,6 +22,17 @@ class TaskForm(forms.ModelForm):
                 attrs={"class": "form-control", "type": "date"}
             ),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop("user", None)
+        super(TaskForm, self).__init__(*args, **kwargs)
+        if user:
+            if user.role == "HOD":
+                self.fields["employee"].queryset = Employee.objects.filter(
+                    department=user.employee.department
+                ).exclude(user=user)
+            elif user.role == "Admin":
+                self.fields["employee"].queryset = Employee.objects.all()
 
 
 class AnnouncementForm(forms.ModelForm):

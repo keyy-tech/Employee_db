@@ -1,22 +1,21 @@
 from django.contrib import admin
 
-from .models import AuditUserLogin
+from .models import AuditLog
 
 
-@admin.register(AuditUserLogin)
-class AuditUserLoginAdmin(admin.ModelAdmin):
-    list_display = ("user", "login_time", "logout_time")  # Show fields
-    readonly_fields = (
-        "user",
-        "login_time",
-        "logout_time",
-    )  # Make all fields read-only
-
-    def has_add_permission(self, request):
-        return False  # Prevent adding records manually
-
-    def has_change_permission(self, request, obj=None):
-        return False  # Prevent editing records
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "table_name", "action_type", "action_time", "record_id")
+    list_filter = ("table_name", "action_type")
+    search_fields = ("table_name", "action_type", "record_id")
 
     def has_delete_permission(self, request, obj=None):
-        return False  # Prevent deleting records
+        # Disable delete
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        # Disable update
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False

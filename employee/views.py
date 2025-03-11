@@ -1,7 +1,7 @@
 import uuid
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
 from django.shortcuts import render, get_object_or_404, redirect
 
@@ -153,7 +153,9 @@ def update_profile(request):
 def profile(request):
     user = request.user
     employee = get_object_or_404(Employee, user=user)
-    return render(request, "employee/profile.html", {"user": user, "employee": employee})
+    return render(
+        request, "employee/profile.html", {"user": user, "employee": employee}
+    )
 
 
 # HR manages departments
@@ -199,3 +201,12 @@ def delete_department(request, id):
     department.delete()
     messages.success(request, "Department deleted successfully")
     return redirect("department_list")
+
+
+@login_required
+def hod_employee(request):
+    if request.user.role == "HOD":
+        department = request.user.employee.department
+        employees = Employee.objects.filter(department=department)
+        context = {"employees": employees}
+        return render(request, "department/employee_list.html", context)

@@ -45,5 +45,11 @@ urlpatterns = [
         name="password_change_done",
     ),
     # Dashboard URL
-    path("dashboard/", views.dashboard_view, name="dashboard"),
+    path("", views.dashboard_view, name="dashboard"),
 ]
+
+# Custom error handlers
+handler404 = views.custom_404_view
+handler500 = views.custom_500_view
+handler403 = views.custom_403_view
+handler400 = views.custom_400_view

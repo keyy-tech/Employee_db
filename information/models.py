@@ -40,10 +40,12 @@ class Notification(models.Model):
         return f"Notification for {self.employee.user.username}"
 
 
+
 class Announcement(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "announcement_154"
