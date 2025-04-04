@@ -1,5 +1,3 @@
-import uuid
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError, transaction
@@ -32,6 +30,8 @@ def create_employee(request):
             email = user_form.cleaned_data["email"]
             role = user_form.cleaned_data["role"]
             default_password = "default_password"
+            first_name = user_form.cleaned_data["first_name"]
+            last_name = user_form.cleaned_data["last_name"]
 
             if (
                 CustomUser.objects.filter(username=username).exists()
@@ -51,17 +51,18 @@ def create_employee(request):
                     username=username,
                     email=email,
                     role=role,
+                    first_name=first_name,
+                    last_name=last_name,
                 )
                 user.set_password(default_password)
                 user.save()
 
                 employee = employee_form.save(commit=False)
                 employee.user = user
-                employee.employee_id = f"{uuid.uuid4().hex[:10].upper()}"
                 employee.save()
 
                 messages.success(request, "Employee created successfully")
-                return redirect("list_employees")
+                return redirect("employee_list")
             except IntegrityError:
                 messages.error(
                     request, "An error occurred while creating the employee."

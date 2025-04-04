@@ -3,90 +3,94 @@
 {% block title %}Departments{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Department List</h2>
-            <div class="d-flex">
-                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by department name..." style="width: 300px;">
+    <div class="container-fluid mt-5">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Department List</h2>
+                <div class="d-flex">
+                    <input type="text" id="searchInput" class="form-control me-2"
+                           placeholder="Search by department name..." style="width: 300px;">
+                    <a href="{% url 'create_department' %}" class="btn btn-success me-2 ms-2">Add Department</a>
+                </div>
             </div>
-        </div>
-        <div class="card-body">
-            <table class="table table-striped table-hover table-bordered">
-                <thead>
+            <div class="card-body">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead>
                     <tr>
                         <th>Name</th>
                         <th>HOD</th>
                         <th>Actions</th>
                     </tr>
-                </thead>
-                <tbody id="departmentTableBody">
+                    </thead>
+                    <tbody id="departmentTableBody">
                     {% for department in departments %}
-                    <tr>
-                        <td>{{ department.name }}</td>
-                        <td>{{ department.hod }}</td>
-                        <td>
-                            <a href="{% url 'update_department' department.id %}" class="btn btn-warning btn-sm">Edit</a>
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-department-id="{{ department.id }}">Delete</button>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>{{ department.name }}</td>
+                            <td>{{ department.hod }}</td>
+                            <td>
+                                <a href="{% url 'update_department' department.id %}" class="btn btn-warning btn-sm">Edit</a>
+                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal" data-department-id="{{ department.id }}">Delete
+                                </button>
+                            </td>
+                        </tr>
                     {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this department?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var departmentId = button.getAttribute('data-department-id');
-            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
-            confirmDeleteButton.href = '{% url "delete_department" 0 %}'.replace('0', departmentId);
-        });
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this department?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // Search functionality
-        var searchInput = document.getElementById('searchInput');
-        var departmentTableBody = document.getElementById('departmentTableBody');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var departmentId = button.getAttribute('data-department-id');
+                var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                confirmDeleteButton.href = '{% url "delete_department" 0 %}'.replace('0', departmentId);
+            });
 
-        searchInput.addEventListener('input', filterTable);
+            // Search functionality
+            var searchInput = document.getElementById('searchInput');
+            var departmentTableBody = document.getElementById('departmentTableBody');
 
-        function filterTable() {
-            var searchValue = searchInput.value.toLowerCase();
-            var rows = departmentTableBody.getElementsByTagName('tr');
+            searchInput.addEventListener('input', filterTable);
 
-            for (var i = 0; i < rows.length; i++) {
-                var nameCell = rows[i].getElementsByTagName('td')[0];
-                var nameText = nameCell.textContent.toLowerCase();
+            function filterTable() {
+                var searchValue = searchInput.value.toLowerCase();
+                var rows = departmentTableBody.getElementsByTagName('tr');
 
-                if (nameText.includes(searchValue)) {
-                    rows[i].style.display = "";
-                } else {
-                    rows[i].style.display = "none";
+                for (var i = 0; i < rows.length; i++) {
+                    var nameCell = rows[i].getElementsByTagName('td')[0];
+                    var nameText = nameCell.textContent.toLowerCase();
+
+                    if (nameText.includes(searchValue)) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
                 }
             }
-        }
-    });
-</script>
+        });
+    </script>
 {% endblock %}

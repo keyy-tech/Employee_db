@@ -40,7 +40,6 @@ class Notification(models.Model):
         return f"Notification for {self.employee.user.username}"
 
 
-
 class Announcement(models.Model):
     title = models.CharField(max_length=255)
     message = models.TextField()

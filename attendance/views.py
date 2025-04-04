@@ -158,7 +158,7 @@ def check_in(request):
         if form.is_valid():
             employee_id = form.cleaned_data["employee_id"]
             try:
-                employee = Employee.objects.get(id=employee_id)
+                employee = Employee.objects.get(employee_id=employee_id)
             except Employee.DoesNotExist:
                 messages.error(request, "Employee does not exist.")
                 return redirect("check_in")
@@ -185,7 +185,7 @@ def check_out(request):
         if form.is_valid():
             employee_id = form.cleaned_data["employee_id"]
             try:
-                employee = Employee.objects.get(id=employee_id)
+                employee = Employee.objects.get(employee_id=employee_id)
             except Employee.DoesNotExist:
                 messages.error(request, "Employee does not exist.")
                 return redirect("check_out")

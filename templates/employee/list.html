@@ -3,30 +3,32 @@
 {% block title %}Employee List{% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-5">
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Employee List</h2>
-            <div class="d-flex">
-                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search by employee name..." style="width: 300px;">
-                <select id="roleSelect" class="form-select me-2">
-                    <option value="">Filter by role</option>
-                    <option value="Admin">Admin</option>
-                    <option value="HOD">HOD</option>
-                    <option value="HR Manager">HR Manager</option>
-                    <option value="Employee">Employee</option>
-                </select>
-                <select id="rowsPerPageSelect" class="form-select">
-                    <option value="10">Show 10 rows</option>
-                    <option value="20">Show 20 rows</option>
-                    <option value="100">Show 100 rows</option>
-                </select>
+    <div class="container-fluid mt-5">
+        <a href="{% url 'create_employee' %}" class="btn btn-success me-2 ms-2 mb-2">Add Employee</a>
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Employee List</h2>
+                <div class="d-flex">
+                    <input type="text" id="searchInput" class="form-control me-2"
+                           placeholder="Search by employee name..." style="width: 300px;">
+                    <select id="roleSelect" class="form-select me-2">
+                        <option value="">Filter by role</option>
+                        <option value="Admin">Admin</option>
+                        <option value="HOD">HOD</option>
+                        <option value="HR Manager">HR Manager</option>
+                        <option value="Employee">Employee</option>
+                    </select>
+                    <select id="rowsPerPageSelect" class="form-select">
+                        <option value="10">Show 10 rows</option>
+                        <option value="20">Show 20 rows</option>
+                        <option value="100">Show 100 rows</option>
+                    </select>
+                </div>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered">
-                    <thead>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover table-bordered">
+                        <thead>
                         <tr>
                             <th>Username</th>
                             <th>First Name</th>
@@ -38,8 +40,8 @@
                             <th>Date of Hire</th>
                             <th>Actions</th>
                         </tr>
-                    </thead>
-                    <tbody id="employeeTableBody">
+                        </thead>
+                        <tbody id="employeeTableBody">
                         {% for employee in employees %}
                             {% if employee.user != request.user %}
                                 <tr>
@@ -52,94 +54,98 @@
                                     <td>{{ employee.job_position }}</td>
                                     <td>{{ employee.date_of_hire }}</td>
                                     <td>
-                                        <a href="#" class="btn btn-info btn-sm">View</a>
-                                        <a href="{% url 'update_employee' employee.user_id %}" class="btn btn-warning btn-sm">Edit</a>
-                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-employee-id="{{ employee.user_id }}">Delete</button>
+
+                                        <a href="{% url 'update_employee' employee.user_id %}"
+                                           class="btn btn-warning btn-sm">Edit</a>
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#deleteModal" data-employee-id="{{ employee.user_id }}">
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this employee?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this employee?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var deleteModal = document.getElementById('deleteModal');
-        deleteModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var employeeId = button.getAttribute('data-employee-id');
-            var confirmDeleteButton = document.getElementById('confirmDeleteButton');
-            confirmDeleteButton.href = '{% url "delete_employee" 0 %}'.replace('0', employeeId);
-        });
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var deleteModal = document.getElementById('deleteModal');
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                var employeeId = button.getAttribute('data-employee-id');
+                var confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                confirmDeleteButton.href = '{% url "delete_employee" 0 %}'.replace('0', employeeId);
+            });
 
-        // Search and filter functionality
-        var searchInput = document.getElementById('searchInput');
-        var roleSelect = document.getElementById('roleSelect');
-        var rowsPerPageSelect = document.getElementById('rowsPerPageSelect');
-        var employeeTableBody = document.getElementById('employeeTableBody');
+            // Search and filter functionality
+            var searchInput = document.getElementById('searchInput');
+            var roleSelect = document.getElementById('roleSelect');
+            var rowsPerPageSelect = document.getElementById('rowsPerPageSelect');
+            var employeeTableBody = document.getElementById('employeeTableBody');
 
-        searchInput.addEventListener('input', filterTable);
-        roleSelect.addEventListener('change', filterTable);
-        rowsPerPageSelect.addEventListener('change', filterTable);
+            searchInput.addEventListener('input', filterTable);
+            roleSelect.addEventListener('change', filterTable);
+            rowsPerPageSelect.addEventListener('change', filterTable);
 
-        function filterTable() {
-            var searchValue = searchInput.value.toLowerCase();
-            var roleValue = roleSelect.value;
-            var rowsPerPage = parseInt(rowsPerPageSelect.value);
-            var rows = employeeTableBody.getElementsByTagName('tr');
-            var visibleRowCount = 0;
+            function filterTable() {
+                var searchValue = searchInput.value.toLowerCase();
+                var roleValue = roleSelect.value;
+                var rowsPerPage = parseInt(rowsPerPageSelect.value);
+                var rows = employeeTableBody.getElementsByTagName('tr');
+                var visibleRowCount = 0;
 
-            for (var i = 0; i < rows.length; i++) {
-                var usernameCell = rows[i].getElementsByTagName('td')[0];
-                var firstNameCell = rows[i].getElementsByTagName('td')[1];
-                var lastNameCell = rows[i].getElementsByTagName('td')[2];
-                var roleCell = rows[i].getElementsByTagName('td')[3];
-                var usernameText = usernameCell.textContent.toLowerCase();
-                var firstNameText = firstNameCell.textContent.toLowerCase();
-                var lastNameText = lastNameCell.textContent.toLowerCase();
-                var roleText = roleCell.textContent;
+                for (var i = 0; i < rows.length; i++) {
+                    var usernameCell = rows[i].getElementsByTagName('td')[0];
+                    var firstNameCell = rows[i].getElementsByTagName('td')[1];
+                    var lastNameCell = rows[i].getElementsByTagName('td')[2];
+                    var roleCell = rows[i].getElementsByTagName('td')[3];
+                    var usernameText = usernameCell.textContent.toLowerCase();
+                    var firstNameText = firstNameCell.textContent.toLowerCase();
+                    var lastNameText = lastNameCell.textContent.toLowerCase();
+                    var roleText = roleCell.textContent;
 
-                var matchesSearch = usernameText.includes(searchValue) || firstNameText.includes(searchValue) || lastNameText.includes(searchValue);
-                var matchesRole = roleValue === "" || roleText === roleValue;
+                    var matchesSearch = usernameText.includes(searchValue) || firstNameText.includes(searchValue) || lastNameText.includes(searchValue);
+                    var matchesRole = roleValue === "" || roleText === roleValue;
 
-                if (matchesSearch && matchesRole) {
-                    if (visibleRowCount < rowsPerPage) {
-                        rows[i].style.display = "";
-                        visibleRowCount++;
+                    if (matchesSearch && matchesRole) {
+                        if (visibleRowCount < rowsPerPage) {
+                            rows[i].style.display = "";
+                            visibleRowCount++;
+                        } else {
+                            rows[i].style.display = "none";
+                        }
                     } else {
                         rows[i].style.display = "none";
                     }
-                } else {
-                    rows[i].style.display = "none";
                 }
             }
-        }
 
-        // Initial filter to apply rows per page setting
-        filterTable();
-    });
-</script>
+            // Initial filter to apply rows per page setting
+            filterTable();
+        });
+    </script>
 {% endblock %}

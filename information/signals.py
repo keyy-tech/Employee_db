@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from attendance.models import Attendance, Leave
 from employee.models import Employee
-from information.models import Task, Announcement, Notification
+from information.models import Task, Notification
 from payroll.models import Payroll
 
 
@@ -11,7 +11,7 @@ from payroll.models import Payroll
 @receiver(post_save, sender=Employee)
 def notify_employee_created_or_updated(sender, instance, created, **kwargs):
     if created:
-        message = f"🎉 Welcome {instance.user.first_name}, your employee profile has been created successfully!"
+        message = f"🎉 Welcome {instance.user.first_name}, your employee profile has been created successfully! Note: Your employee id is {instance.employee_id}."
     else:
         message = f"🔄 Your employee profile has been updated."
 
@@ -32,6 +32,7 @@ def notify_payroll_processed_or_updated(sender, instance, created, **kwargs):
 # 3️⃣ Task Assigned & Completed
 @receiver(post_save, sender=Task)
 def notify_task_updates(sender, instance, created, **kwargs):
+    message = ""
     if created:
         message = f"📌 New Task Assigned: {instance.title}. Due by {instance.due_date}."
     elif instance.status.lower() == "completed":
@@ -42,15 +43,22 @@ def notify_task_updates(sender, instance, created, **kwargs):
     Notification.objects.create(employee=instance.employee, message=message)
 
 
+@receiver(post_save, sender=Leave)
+def notify_leave_updates(sender, instance, created, **kwargs):
+    if created:
+        message = f"📌 New Leave Created. Wait for you response."
+        Notification.objects.create(employee=instance.employee, message=message)
+
+
 # 4️⃣ Leave Approval & Rejection
 @receiver(post_save, sender=Leave)
 def notify_leave_status(sender, instance, **kwargs):
     if instance.status.lower() == "approved":
         message = f"✅ Your leave from {instance.start_date} to {instance.end_date} has been approved. Enjoy your time off!"
+        Notification.objects.create(employee=instance.employee, message=message)
     elif instance.status.lower() == "rejected":
         message = f"❌ Your leave request from {instance.start_date} to {instance.end_date} was rejected. Contact HR for details."
-
-    Notification.objects.create(employee=instance.employee, message=message)
+        Notification.objects.create(employee=instance.employee, message=message)
 
 
 # 5️⃣ Check-In & Check-Out
@@ -58,15 +66,7 @@ def notify_leave_status(sender, instance, **kwargs):
 def notify_attendance(sender, instance, created, **kwargs):
     if instance.check_in_time and not instance.check_out_time:
         message = f"🕒 You checked in at {instance.check_in_time.strftime('%H:%M')}. Have a productive day!"
+        Notification.objects.create(employee=instance.employee, message=message)
     elif instance.check_out_time:
         message = f"🏁 You checked out at {instance.check_out_time.strftime('%H:%M')}. See you tomorrow!"
-
-    Notification.objects.create(employee=instance.employee, message=message)
-
-
-# 6️⃣ Announcements
-@receiver(post_save, sender=Announcement)
-def notify_announcement(sender, instance, created, **kwargs):
-    if created:
-        message = f"📢 New Announcement: {instance.title} - {instance.content[:50]}..."
         Notification.objects.create(employee=instance.employee, message=message)
