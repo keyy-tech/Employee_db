@@ -32,7 +32,9 @@ class TaskForm(forms.ModelForm):
                     department=user.employee.department
                 ).exclude(user=user)
             elif user.role == "Admin":
-                self.fields["employee"].queryset = Employee.objects.all()
+                self.fields["employee"].queryset = Employee.objects.all().exclude(
+                    user=user
+                )
 
 
 class AnnouncementForm(forms.ModelForm):

@@ -1,7 +1,6 @@
 from django import forms
 
-from employee.models import Employee
-from .models import Leave, Attendance
+from .models import Leave
 
 
 class LeaveForm(forms.ModelForm):
@@ -30,7 +29,12 @@ class LeaveForm(forms.ModelForm):
 
 
 class CheckInForm(forms.Form):
-    employee_id = forms.IntegerField(label="Employee ID", widget=forms.NumberInput(attrs={"class": "form-control"}))
+    employee_id = forms.CharField(
+        label="Employee ID", widget=forms.TextInput(attrs={"class": "form-control"})
+    )
+
 
 class CheckOutForm(forms.Form):
-    employee_id = forms.IntegerField(label="Employee ID", widget=forms.NumberInput(attrs={"class": "form-control"}))
+    employee_id = forms.CharField(
+        label="Employee ID", widget=forms.TextInput(attrs={"class": "form-control"})
+    )

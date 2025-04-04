@@ -5,7 +5,7 @@ from django.shortcuts import redirect, render
 
 from attendance.models import Attendance, Leave
 from employee.models import Employee, Department
-from information.models import Announcement, Task
+from information.models import Announcement
 from .forms import LoginForm, CustomPasswordChangeForm
 
 
@@ -84,9 +84,9 @@ def dashboard_view(request):
                 department=department
             ).count()
 
-        # Employee tasks (only for Employees and HODs)
-        if user_role in ["Employee", "HOD"]:
-            total_tasks = Task.objects.filter(assigned_to=request.user).count()
+        # # Employee tasks (only for Employees and HODs)
+        # if user_role == "Employee" or user_role == "HR Manager":
+        #     total_tasks = Task.objects.filter(employee=request.user).count()
 
         # Recent attendance records (for department members)
         recent_attendance = Attendance.objects.filter(
